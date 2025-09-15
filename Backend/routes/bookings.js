@@ -12,12 +12,15 @@ const {
   cancelBooking,
   markDone,
   approveWork,
+  markSuccessful,
 } = require("../controllers/bookingController");
 
 const router = express.Router();
 
 // ✅ All routes below require authentication
 router.use(protect);
+
+router.patch("/:id/success", protect, markSuccessful);
 
 // Worker marks assigned booking as done
 router.put("/:id/mark-done", markDone);

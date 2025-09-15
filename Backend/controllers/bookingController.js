@@ -186,6 +186,9 @@ exports.assignWorker = asyncHandler(async (req, res) => {
   }
 
   // Assign worker to booking
+  // console.log(`Assigning worker ${worker.name} to booking ${booking._id}`);
+  // console.log(`Booking details: ${JSON.stringify(booking)}`);
+  // console.log(worker.id, worker.name, worker.services);
   booking.assignedWorker = worker._id;
   booking.assignmentNote = note?.trim() || "";
   booking.status = "confirmed"; // confirmed means assigned
@@ -268,24 +271,28 @@ exports.markDone = asyncHandler(async (req, res) => {
 
   if (!booking) return res.status(404).json({ message: "Booking not found" });
 
+  console.log(`Marking booking ${booking._id} as done`);
   // Ensure only assigned worker (or admin) can mark as done
   if (!req.user || (booking.assignedWorker?.toString() !== req.user._id.toString() && !req.user.isAdmin)) {
     return res.status(403).json({ message: "Not allowed to mark this booking as done" });
   }
 
+  console.log(`Booking ${booking._id} status: ${booking.status}`);
   // Validate status
   if (["cancelled", "completed"].includes(booking.status)) {
     return res.status(400).json({ message: "Booking cannot be marked done in its current state" });
   }
 
-  // ✅ Directly mark as completed
-  booking.status = "completed"; 
+  console.log(`Marking booking ${booking._id} as done`);
+  // ✅ Directly mark as done
+  booking.status = "done"; 
   booking.doneAt = Date.now();
   booking.userApproval = true; // Optional: if you want auto-approval by worker
 
   await booking.save();
 
-  res.json({ message: "Booking marked as completed ✅", booking });
+  //res.json({ message: "Booking marked as completed ✅", booking });
+  res.json({ message: "Work marked as done, waiting for customer approval", booking });
 });
 
 
@@ -318,4 +325,30 @@ exports.approveWork = asyncHandler(async (req, res) => {
   res.json({ message: "✅ Work approved successfully", booking });
 });
 
+exports.rejectWork = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const booking = await Booking.findById(id);
 
+  if (!booking) return res.status(404).json({ message: "Booking not found" });
+  if (booking.status !== "Done") return res.status(400).json({ message: "Work not marked as done" });
+
+  booking.status = "Rejected";
+  await booking.save();
+
+  res.json({ message: "Work rejected, admin will review", booking });
+});
+
+
+// ================== Mark Successful ==================
+exports.markSuccessful = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const booking = await Booking.findById(id);
+  if (!booking) return res.status(404).json({ message: "Booking not found" });
+  if (booking.status !== "completed")
+    return res.status(400).json({ message: "Only completed bookings can be marked successful" });
+
+  booking.status = "SUCCESSFUL";
+  await booking.save();
+
+  res.json({ message: "Booking marked as SUCCESSFUL", booking });
+});

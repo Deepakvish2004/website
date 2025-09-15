@@ -9,6 +9,9 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("bookings"); // bookings | workers
   const navigate = useNavigate();
+  const [name, setName] = useState("");
+const [email, setEmail] = useState("");
+
 
   // Fetch Bookings
   const fetchBookings = async () => {
@@ -33,10 +36,31 @@ export default function AdminDashboard() {
       alert("Failed to load workers");
     }
   };
+  // ✅ Load Admin Profile (from localStorage OR API)
+  const fetchAdminProfile = async () => {
+    try {
+      // Check if we stored admin details in localStorage after login
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        const parsed = JSON.parse(storedUser);
+        setName(parsed.name || "Admin");
+        setEmail(parsed.email || "");
+      } else {
+        // Fallback: Call backend API (optional)
+        const { data } = await API.get("/admin/me");
+        setName(data.name || "Admin");
+        setEmail(data.email || "");
+      }
+    } catch (err) {
+      console.error("Failed to fetch admin profile:", err);
+    }
+  };
+
 
   useEffect(() => {
     fetchBookings();
     fetchWorkers();
+    fetchAdminProfile();
   }, []);
 
   // Booking Status Change
@@ -85,6 +109,7 @@ export default function AdminDashboard() {
       b.user?.name?.toLowerCase().includes(s) ||
       b.user?.email?.toLowerCase().includes(s) ||
       b.address?.toLowerCase().includes(s)
+      
     );
   });
 
@@ -97,12 +122,17 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="flex min-h-screen border-5 rounded-lg bg-gray-100">
+    <div className="flex min-h-screen bg-gray-100">
       {/* Sidebar */}
       <div className="w-64 bg-gray-800 text-white flex flex-col p-4">
         <div className="text-center mb-8">
-          <div className="w-20 h-20 mx-auto bg-gray-600 rounded-full"></div>
-          <h2 className="mt-2 font-semibold">Admin Panel</h2>
+          {/* Avatar */}
+          <div className="w-20 h-20 mx-auto bg-gray-600 rounded-full flex items-center justify-center text-2xl font-bold">
+            {name ? name.charAt(0).toUpperCase() : "A"}
+          </div>
+          {/* Show Admin Name */}
+          <h2 className="mt-2 font-semibold">{name || "Admin Panel"}</h2>
+          <p className="text-sm text-gray-300">{email}</p>
         </div>
         <nav className="space-y-2">
           <button
@@ -185,6 +215,7 @@ export default function AdminDashboard() {
                       <th className="p-2">S.No</th>
                       <th className="p-2">Service</th>
                       <th className="p-2">User</th>
+                      <th className="p-2">Phone</th>
                       <th className="p-2">Status</th>
                       <th className="p-2">Actions</th>
                     </tr>
@@ -195,9 +226,27 @@ export default function AdminDashboard() {
                         <td className="p-2">{i + 1}</td>
                         <td className="p-2">{b.service}</td>
                         <td className="p-2">{b.name ?? "N/A"}</td>
+                        <td className="p-2">{b.phone ?? "N/A"}</td>
                         <td className="p-2 font-semibold capitalize">
-                          {b.status}
-                        </td>
+  <span
+    className={`inline-block px-3 py-1 rounded-full text-sm font-medium border ${
+      b.status === "pending"
+        ? "bg-yellow-100 text-yellow-800 border-yellow-300"
+        : b.status === "assigned"
+        ? "bg-blue-100 text-blue-800 border-blue-300"
+        : b.status === "confirmed"
+        ? "bg-green-100 text-green-800 border-green-300"
+        : b.status === "completed"
+        ? "bg-purple-100 text-purple-800 border-purple-300"
+        : b.status === "cancelled"
+        ? "bg-red-100 text-red-800 border-red-300"
+        : "bg-gray-100 text-gray-800 border-gray-300"
+    }`}
+  >
+    {b.status}
+  </span>
+</td>
+
                         <td className="p-2 space-x-2">
                           {b.status === "pending" && (
                             <>
@@ -260,75 +309,91 @@ export default function AdminDashboard() {
           </>
         )}
 
-        {/* WORKER MANAGEMENT SECTION */}
-        {activeTab === "workers" && (
-          <>
-            <h1 className="text-4xl font-bold mb-6 bg-gradient-to-r from-blue-600 via-teal-600 to-green-600 text-transparent bg-clip-text">
-              Worker Management
-            </h1>
+       {/* WORKER MANAGEMENT SECTION */}
+{activeTab === "workers" && (
+  <>
+    <h1 className="text-4xl font-bold mb-6 bg-gradient-to-r from-blue-600 via-teal-600 to-green-600 text-transparent bg-clip-text">
+      Worker Management
+    </h1>
 
-            {/* Summary Cards for Workers */}
-            <div className="grid grid-cols-3 gap-6 mb-6">
-              <div className="p-6 rounded-xl shadow text-white bg-gradient-to-r from-indigo-400 to-indigo-600">
-                <h2 className="text-lg font-semibold">Total Workers</h2>
-                <p className="text-3xl font-bold">{workers.length}</p>
-              </div>
-              <div className="p-6 rounded-xl shadow text-white bg-gradient-to-r from-green-400 to-green-600">
-                <h2 className="text-lg font-semibold">Active</h2>
-                <p className="text-3xl font-bold">
-                  {workers.filter((w) => w.status === "active").length}
-                </p>
-              </div>
-              <div className="p-6 rounded-xl shadow text-white bg-gradient-to-r from-red-400 to-red-600">
-                <h2 className="text-lg font-semibold">Blocked</h2>
-                <p className="text-3xl font-bold">
-                  {workers.filter((w) => w.status === "blocked").length}
-                </p>
-              </div>
-            </div>
+    {/* Summary Cards for Workers */}
+    <div className="grid grid-cols-3 gap-6 mb-6">
+      <div className="p-6 rounded-xl shadow text-white bg-gradient-to-r from-indigo-400 to-indigo-600">
+        <h2 className="text-lg font-semibold">Total Workers</h2>
+        <p className="text-3xl font-bold">{workers.length}</p>
+      </div>
+      <div className="p-6 rounded-xl shadow text-white bg-gradient-to-r from-green-400 to-green-600">
+        <h2 className="text-lg font-semibold">Active</h2>
+        <p className="text-3xl font-bold">
+          {workers.filter((w) => w.active === true).length}
+        </p>
+      </div>
+      <div className="p-6 rounded-xl shadow text-white bg-gradient-to-r from-red-400 to-red-600">
+        <h2 className="text-lg font-semibold">Inactive</h2>
+        <p className="text-3xl font-bold">
+          {workers.filter((w) => w.active === false).length}
+        </p>
+      </div>
+    </div>
 
-            {/* Worker Table */}
-            <div className="bg-white rounded-lg shadow p-4">
-              <h2 className="text-xl font-semibold mb-4">All Workers</h2>
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr className="bg-gray-200 text-left">
-                    <th className="p-2">S.No</th>
-                    <th className="p-2">Name</th>
-                    <th className="p-2">Email</th>
-                    <th className="p-2">Services Known</th>
-                    <th className="p-2">Age</th>
-                    <th className="p-2">Gender</th>
-                    <th className="p-2">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {workers.map((w, i) => (
-                    <tr key={w._id} className="border-b">
-                      <td className="p-2">{i + 1}</td>
-                      <td className="p-2">{w.name}</td>
-                      <td className="p-2">{w.email}</td>
-                      <td className="p-2 capitalize">
-                        {Array.isArray(w.services) && w.services.length > 0
-                          ? w.services.join(", ")
-                          : w.service ?? "Not Assigned"}
-                      </td>
-                      <td className="p-2">{w.age ?? "N/A"}</td>
-                      <td className="p-2">{w.gender ?? "N/A"}</td>
-                      <td
-                        className={`p-2 font-semibold ${
-                          w.active ? "text-green-600" : "text-red-600"
-                        }`}
+    {/* Worker Table */}
+    <div className="bg-white rounded-lg shadow p-4">
+      <h2 className="text-xl font-semibold mb-4">All Workers</h2>
+      <table className="w-full border-collapse">
+        <thead>
+          <tr className="bg-gray-200 text-left">
+            <th className="p-2">S.No</th>
+            <th className="p-2">Name</th>
+            <th className="p-2">Email</th>
+            <th className="p-2">Services Known</th>
+            <th className="p-2">Age</th>
+            <th className="p-2">Gender</th>
+            <th className="p-2 text-center">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {workers.map((w, i) => (
+            <tr key={w._id} className="border-b hover:bg-gray-50">
+              <td className="p-2">{i + 1}</td>
+              <td className="p-2 font-semibold">{w.name}</td>
+              <td className="p-2">{w.email}</td>
+              <td className="p-2">
+                {Array.isArray(w.services) && w.services.length > 0 ? (
+                  <div className="flex flex-wrap gap-2">
+                    {w.services.map((s, idx) => (
+                      <span
+                        key={idx}
+                        className="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full"
                       >
-                        {w.active ? "Active" : "Inactive"}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </>
-        )}
+                        {s}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <span className="text-gray-500 italic">Not Assigned</span>
+                )}
+              </td>
+              <td className="p-2">{w.age ?? "N/A"}</td>
+              <td className="p-2 capitalize">{w.gender ?? "N/A"}</td>
+              <td className="p-2 text-center">
+                <span
+                  className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                    w.active
+                      ? "bg-green-100 text-green-700"
+                      : "bg-red-100 text-red-700"
+                  }`}
+                >
+                  {w.active ? "Active" : "Inactive"}
+                </span>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </>
+)}
+
       </div>
     </div>
   );

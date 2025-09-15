@@ -14,9 +14,13 @@ const workerRoutes = require('./routes/workers');
 app.use('/api/workers', workerRoutes);
 
 
+
 // routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/bookings', require('./routes/bookings'));
+
+const feedbackRoutes = require('./routes/feedbackRoutes');
+app.use('/api/feedback', feedbackRoutes);
 
 app.get('/', (req, res) => res.send('Urban Booking API running'));
 

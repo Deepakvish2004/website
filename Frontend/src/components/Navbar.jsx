@@ -5,6 +5,9 @@ export default function Navbar({ user, logout }) {
   const [openDropdown, setOpenDropdown] = useState(false);
   const dropdownRef = useRef(null);
 
+  // Dummy state to trigger auto-refresh
+  const [tick, setTick] = useState(0);
+
   // Close dropdown if clicked outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -16,8 +19,16 @@ export default function Navbar({ user, logout }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Auto-refresh every 30 seconds (update tick state)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTick(prev => prev + 1); // triggers re-render
+    }, 30000); // 30000ms = 30 seconds
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <nav className="bg-gradient-to-r from-violet-300  border-5 border-violet-600 hover:border-black rounded-lg to-indigo-300 shadow-md p-4 flex justify-between items-center relative">
+    <nav className="bg-gradient-to-r from-violet-300 border-5 border-violet-600 hover:border-black rounded-lg to-indigo-300 shadow-md p-4 flex justify-between items-center relative">
       {/* Left Side */}
       <div className="flex items-center gap-6">
         <Link
@@ -26,95 +37,112 @@ export default function Navbar({ user, logout }) {
         >
           Hand Services
         </Link>
-        <Link
-          to="/services"
-          className="text-white text-sm hover:text-yellow-800 transition "
-        >
-          Services
-        </Link>
+
+        {!user && (
+          <Link
+            to="/services"
+            className="text-white text-sm hover:text-yellow-800 transition"
+          >
+            Services
+          </Link>
+        )}
       </div>
 
       {/* Right Side */}
       <div className="flex items-center gap-4">
         {!user && (
-          <div className="relative" ref={dropdownRef}>
-            {/* Dropdown trigger */}
-            <button
-              onClick={() => setOpenDropdown(!openDropdown)}
-              className="flex items-center gap-1 text-sm font-semibold px-4 py-2 rounded-full 
+          <>
+            {/* Login Dropdown */}
+            <div className="relative" ref={dropdownRef}>
+              <button
+                onClick={() => setOpenDropdown(!openDropdown)}
+                className="flex items-center gap-1 text-sm font-semibold px-4 py-2 rounded-full 
+                  bg-white text-violet-700 border-2 border-violet-600 shadow-md
+                  hover:bg-violet-600 hover:text-white transition duration-200"
+              >
+                Login
+                <span
+                  className={`transform transition-transform duration-200 ${
+                    openDropdown ? "rotate-180" : "rotate-0"
+                  }`}
+                >
+                  ▾
+                </span>
+              </button>
+
+              {openDropdown && (
+                <div className="absolute right-0 mt-2 w-44 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden animate-fadeIn z-50">
+                  <Link
+                    to="/login"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-violet-100"
+                    onClick={() => setOpenDropdown(false)}
+                  >
+                    👤 User Login
+                  </Link>
+                  <Link
+                    to="/worker/login"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-violet-100"
+                    onClick={() => setOpenDropdown(false)}
+                  >
+                    🛠 Worker Login
+                  </Link>
+                  <Link
+                    to="/admin/login"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-violet-100"
+                    onClick={() => setOpenDropdown(false)}
+                  >
+                    🔑 Admin Login
+                  </Link>
+                </div>
+              )}
+            </div>
+
+            <Link
+              to="/register"
+              className="text-sm font-semibold px-4 py-2 rounded-full 
                 bg-white text-violet-700 border-2 border-violet-600 shadow-md
                 hover:bg-violet-600 hover:text-white transition duration-200"
             >
-              Login
-              <span
-                className={`transform transition-transform duration-200 ${
-                  openDropdown ? "rotate-180" : "rotate-0"
-                }`}
-              >
-                ▾
-              </span>
-            </button>
-
-            {/* Dropdown menu (toggle only) */}
-            {openDropdown && (
-              <div className="absolute right-0 mt-2 w-44 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden animate-fadeIn z-50">
-                <Link
-                  to="/login"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-violet-100"
-                  onClick={() => setOpenDropdown(false)}
-                >
-                  👤 User Login
-                </Link>
-                <Link
-                  to="/worker/login"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-violet-100"
-                  onClick={() => setOpenDropdown(false)}
-                >
-                  🛠 Worker Login
-                </Link>
-                <Link
-                  to="/admin/login"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-violet-100"
-                  onClick={() => setOpenDropdown(false)}
-                >
-                  🔑 Admin Login
-                </Link>
-              </div>
-            )}
-          </div>
-        )}
-
-        {!user && (
-          <Link
-            to="/register"
-            className="text-sm font-semibold px-4 py-2 rounded-full 
-              bg-white text-violet-700 border-2 border-violet-600 shadow-md
-              hover:bg-violet-600 hover:text-white transition duration-200"
-          >
-            Register
-          </Link>
+              Register
+            </Link>
+          </>
         )}
 
         {user && (
           <>
-            <Link
-              to="/dashboard"
-              className="text-sm font-semibold px-4 py-2 rounded-full 
-                bg-white text-violet-700 border-2 border-violet-600 shadow-md
-                hover:bg-violet-600 hover:text-white transition"
-            >
-              My Bookings
-            </Link>
-            {user.role === "admin" && (
+            {user.role === "user" && (
               <Link
-                to="/admin"
+                to="/dashboard"
                 className="text-sm font-semibold px-4 py-2 rounded-full 
                   bg-white text-violet-700 border-2 border-violet-600 shadow-md
                   hover:bg-violet-600 hover:text-white transition"
               >
-                Admin
+                My Bookings
               </Link>
             )}
+
+            {user.role === "admin" && (
+              <>
+                <Link
+                  to="/admin"
+                  className="text-sm font-semibold px-4 py-2 rounded-full 
+                    bg-white text-violet-700 border-2 border-violet-600 shadow-md
+                    hover:bg-violet-600 hover:text-white transition"
+                >
+                  Admin
+                </Link>
+                <Link
+                  to="/admin/workers"
+                  className="text-sm font-semibold px-4 py-2 rounded-full 
+                    bg-white text-violet-700 border-2 border-violet-600 shadow-md
+                    hover:bg-violet-600 hover:text-white transition"
+                >
+                  Create Worker
+                </Link>
+              </>
+            )}
+
+            {/* Logout button */}
             <button
               onClick={logout}
               className="text-sm font-semibold px-4 py-2 rounded-full 

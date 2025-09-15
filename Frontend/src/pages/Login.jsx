@@ -26,7 +26,7 @@ export default function LoginPage() {
       } else if (data.role === "worker") {
         navigate("/worker/dashboard");
       } else {
-        navigate("/user/dashboard");
+        navigate("/dashboard");
       }
     } catch (err) {
       setError(err.response?.data?.message || "Login failed");

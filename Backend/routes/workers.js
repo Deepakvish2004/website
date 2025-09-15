@@ -1,6 +1,9 @@
-// backend/routes/workers.js
 const express = require("express");
-const { registerWorker, loginWorker, workerProtect } = require("../controllers/workerAuthController");
+const {
+  registerWorker,
+  loginWorker,
+  workerProtect,
+} = require("../controllers/workerAuthController");
 const {
   createWorker,
   getWorkers,
@@ -8,6 +11,7 @@ const {
   deleteWorker,
   getMyBookings,
   updateBookingStatus,
+  toggleWorkerActive,
 } = require("../controllers/workerController");
 const { protect, admin } = require("../controllers/authController");
 
@@ -23,24 +27,19 @@ router.post("/register", protect, admin, registerWorker);
 router.post("/login", loginWorker);
 
 /**
- * ========== Admin CRUD Workers ==========
- */
-router.use(protect); // all routes below require admin or logged-in user
-
-router.get("/", admin, getWorkers);
-router.post("/", admin, createWorker);
-router.patch("/:id", admin, updateWorker);
-router.delete("/:id", admin, deleteWorker);
-
-/**
  * ========== Worker Side ==========
  */
-// Worker fetch own bookings (use workerProtect here!)
+// ✅ Worker routes should NOT be blocked by `protect`
 router.get("/my-bookings", workerProtect, getMyBookings);
-
-// Worker update booking status
 router.patch("/my-bookings/:id/status", workerProtect, updateBookingStatus);
+router.patch("/toggle-active", workerProtect, toggleWorkerActive);
+
+/**
+ * ========== Admin CRUD Workers ==========
+ */
+router.get("/", protect, admin, getWorkers);
+router.post("/", protect, admin, createWorker);
+router.patch("/:id", protect, admin, updateWorker);
+router.delete("/:id", protect, admin, deleteWorker);
 
 module.exports = router;
-
-

@@ -49,11 +49,34 @@ export default function AdminWorkers() {
           .filter(Boolean),
       });
       alert("✅ Worker created successfully!");
-      setForm({ image: "", name: "", email: "", phone: "", password: "", services: "" , pincode: "",age: "",gender: "",address: ""});
+      setForm({
+        image: "",
+        name: "",
+        email: "",
+        phone: "",
+        password: "",
+        services: "",
+        pincode: "",
+        age: "",
+        gender: "",
+        address: "",
+      });
       loadWorkers();
     } catch (err) {
       console.error(err);
       alert(err.response?.data?.message || "Error creating worker");
+    }
+  };
+
+  // Approve / Reject
+  const handleStatusChange = async (id, status) => {
+    try {
+      await API.patch(`/workers/${id}/status`, { status });
+      alert(`✅ Worker ${status}`);
+      loadWorkers();
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.message || "Error updating status");
     }
   };
 
@@ -122,7 +145,7 @@ export default function AdminWorkers() {
             placeholder="Age"
             className="border p-2 rounded focus:ring focus:ring-indigo-300"
           />
-           <input
+          <input
             name="pincode"
             value={form.pincode}
             onChange={handleChange}
@@ -156,7 +179,13 @@ export default function AdminWorkers() {
             className="border p-2 rounded col-span-2 focus:ring focus:ring-indigo-300"
             required
           />
-          <input name="image" value={form.image} onChange={handleChange} placeholder="Image URL" className="border p-2 rounded col-span-2" />
+          <input
+            name="image"
+            value={form.image}
+            onChange={handleChange}
+            placeholder="Image URL"
+            className="border p-2 rounded col-span-2"
+          />
         </div>
         <button
           type="submit"
@@ -173,6 +202,7 @@ export default function AdminWorkers() {
           <thead className="bg-gray-800 text-white">
             <tr>
               <th className="p-3 text-left">Name</th>
+              <th className="p-3 text-left">Status</th>
               <th className="p-3 text-left">Image</th>
               <th className="p-3 text-left">Email</th>
               <th className="p-3 text-left">Phone</th>
@@ -188,8 +218,25 @@ export default function AdminWorkers() {
             {workers.map((w) => (
               <tr key={w._id} className="border-b hover:bg-gray-50 transition">
                 <td className="p-3 font-medium">{w.name}</td>
+                <td className="p-3">
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                      w.status === "approved"
+                        ? "bg-green-100 text-green-700"
+                        : w.status === "rejected"
+                        ? "bg-red-100 text-red-700"
+                        : "bg-yellow-100 text-yellow-700"
+                    }`}
+                  >
+                    {w.status || "pending"}
+                  </span>
+                </td>
                 <td className="p-3 font-medium">
-                  <img src={w.image} alt={w.name} className="w-12 h-12 rounded-full" />
+                  <img
+                    src={w.image}
+                    alt={w.name}
+                    className="w-12 h-12 rounded-full"
+                  />
                 </td>
                 <td className="p-3">{w.email}</td>
                 <td className="p-3">{w.phone || "-"}</td>
@@ -213,7 +260,23 @@ export default function AdminWorkers() {
                     <span className="text-gray-400 italic">No Services</span>
                   )}
                 </td>
-                <td className="p-3 text-center">
+                <td className="p-3 text-center space-x-2">
+                  {w.status === "pending" && (
+                    <>
+                      <button
+                        onClick={() => handleStatusChange(w._id, "approved")}
+                        className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition"
+                      >
+                        Approve
+                      </button>
+                      <button
+                        onClick={() => handleStatusChange(w._id, "rejected")}
+                        className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 transition"
+                      >
+                        Reject
+                      </button>
+                    </>
+                  )}
                   <button
                     onClick={() => handleDelete(w._id)}
                     className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition"
@@ -225,7 +288,7 @@ export default function AdminWorkers() {
             ))}
             {workers.length === 0 && (
               <tr>
-                <td colSpan={5} className="p-4 text-center text-gray-500">
+                <td colSpan={11} className="p-4 text-center text-gray-500">
                   No workers found
                 </td>
               </tr>

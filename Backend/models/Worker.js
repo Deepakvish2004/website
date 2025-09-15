@@ -14,8 +14,18 @@ const workerSchema = new mongoose.Schema(
     pincode: { type: String },
     gender: { type: String, enum: ["male", "female", "other"] },
     image: { type: String },
+    active: { type: Boolean, default: true }, // ✅ worker is active by default
+  availability: {
+    days: [{ type: String }], // e.g. ["Monday", "Wednesday", "Friday"]
+  },
 
-    active: { type: Boolean, default: false },
+  status: {
+    type: String,
+    enum: ["pending", "approved", "rejected"],
+    default: "pending",
+  },
+
+    
 
     role: {
     type: String,
@@ -25,6 +35,7 @@ const workerSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
 
 // Hash password before save
 workerSchema.pre("save", async function (next) {

@@ -136,3 +136,19 @@ exports.assignWorker = asyncHandler(async (req, res) => {
     booking: populatedBooking,
   });
 });
+
+// ✅ Toggle Active Status
+exports.toggleWorkerActive = asyncHandler(async (req, res) => {
+  const worker = await Worker.findById(req.user._id);
+  if (!worker) {
+    return res.status(404).json({ message: "Worker not found" });
+  }
+
+  worker.active = !worker.active; // flip the status
+  await worker.save();
+
+  res.json({
+    message: `Worker is now ${worker.active ? "active" : "inactive"}`,
+    active: worker.active,
+  });
+});

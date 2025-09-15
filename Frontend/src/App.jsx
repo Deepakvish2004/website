@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, Link } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import Services from './pages/Services';
 import BookingPage from './pages/BookingPage';
@@ -13,15 +13,11 @@ import WorkerLogin from "./pages/WorkerLogin";
 import WorkerDashboard from "./pages/WorkerDashboard";
 import AdminWorkers from "./pages/AdminWorkers";
 import AdminLogin from "./pages/AdminLogin";
-
 import Navbar from './components/Navbar';
 import AdminReports from "./pages/AdminReports";
-
-
-
+import WorkerRegistration from "./pages/WorkerRegistration";
 
 function getUserFromStorage() {
-  
   try {
     const data = localStorage.getItem('user');
     if (!data || data === "undefined") return null;
@@ -42,30 +38,82 @@ function App() {
 
   return (
     <div>
-      <div>
-      {/* navbar */}
+      {/* Navbar with user info */}
       <Navbar user={user} logout={logout} />
-      </div>
-
 
       <main className="container mx-auto p-6">
         <Routes>
-          <Route path="/" element={<Home/>} />
-          <Route path="/services" element={<Services/>} />
-          <Route path="/book/:service?" element={<BookingPage/>} />
-          <Route path="/login" element={<Login/>} />
-          <Route path="/register" element={<Register/>} />
-          <Route path="/dashboard" element={<ProtectedRoute><UserDashboard/></ProtectedRoute>} />
-          <Route path="/admin" element={<ProtectedRoute adminOnly><AdminDashboard/></ProtectedRoute>} />
-          <Route path="/admin/bookings" element={<ProtectedRoute adminOnly><AdminBookings/></ProtectedRoute>} />
-           {/* Worker side */}
-  <Route path="/worker/login" element={<WorkerLogin />} />
-  <Route path="/worker/dashboard" element={<WorkerDashboard />} />
-  <Route path="/admin/workers" element={<AdminWorkers />} />
+          {/* Public Routes */}
+          <Route path="/" element={<Home />} />
+          {/* ✅ Pass user to Services so it can redirect correctly */}
+          <Route path="/services" element={<Services user={user} />} />
+          
+          {/* Booking route protected - cannot access if not logged in */}
+          <Route 
+            path="/book/:service?" 
+            element={
+              <ProtectedRoute>
+                <BookingPage />
+              </ProtectedRoute>
+            } 
+          />
+          
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
 
-  <Route path="/admin/login" element={<AdminLogin />} />
-  <Route path="/admin/dashboard" element={<AdminDashboard />} />
-  <Route path="/admin/reports" element={<AdminReports />} />
+          {/* User dashboard (protected) */}
+          <Route 
+            path="/dashboard" 
+            element={
+              <ProtectedRoute>
+                <UserDashboard />
+              </ProtectedRoute>
+            } 
+          />
+
+          {/* Admin dashboard & routes (protected + adminOnly) */}
+          <Route 
+            path="/admin" 
+            element={
+              <ProtectedRoute adminOnly>
+                <AdminDashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/bookings" 
+            element={
+              <ProtectedRoute adminOnly>
+                <AdminBookings />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/workers" 
+            element={
+              <ProtectedRoute adminOnly>
+                <AdminWorkers />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/reports" 
+            element={
+              <ProtectedRoute adminOnly>
+                <AdminReports />
+              </ProtectedRoute>
+            } 
+          />
+
+          
+
+          {/* Worker routes (optional protection if needed later) */}
+          <Route path="/worker/login" element={<WorkerLogin />} />
+          <Route path="/worker/dashboard" element={<WorkerDashboard />} />
+          <Route path="/worker/register" element={<WorkerRegistration />} />
+
+          {/* Admin login (public) */}
+          <Route path="/admin/login" element={<AdminLogin />} />
         </Routes>
       </main>
     </div>

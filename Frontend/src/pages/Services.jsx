@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import cleaner from '../assets/cleaner.jpg';
 import washing from '../assets/washing.jpg';
 import cleaners from '../assets/cleaners.jpg';
@@ -10,7 +10,21 @@ const services = [
   { id: 'washing', name: 'Washing', desc: 'Laundry service',        image: washing, price: 100 }
 ];
 
-export default function Services() {
+export default function Services({ user }) {
+  const navigate = useNavigate();
+
+  const handleBook = (service) => {
+    if (user) {
+      // ✅ User logged in → go to booking page
+      navigate(`/book/${service.id}`, {
+        state: { id: service.id, name: service.name, price: service.price }
+      });
+    } else {
+      // ❌ Not logged in → go to login
+      navigate('/login');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 p-8 relative overflow-hidden">
       {/* Overlay blur effect */}
@@ -41,14 +55,13 @@ export default function Services() {
                 ₹{s.price}
               </p>
 
-              {/* Pass data to booking page */}
-              <Link
-                to={`/book/${s.id}`}
-                state={{ id: s.id, name: s.name, price: s.price }}
+              {/* BOOK NOW button */}
+              <button
+                onClick={() => handleBook(s)}
                 className="mt-4 inline-block text-sm text-blue-600 font-semibold hover:underline"
               >
                 Book now
-              </Link>
+              </button>
             </div>
           </div>
         ))}

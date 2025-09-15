@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import API from "../api/axios";
 
-// fallback prices if user refreshes page without state
 const fallbackServices = {
   cleaners: { name: "Cleaners", price: 200 },
   helper: { name: "Helper", price: 150 },
@@ -24,10 +23,21 @@ export default function BookingPage() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
-  const [paid, setPaid] = useState(false); // ✅ track demo payment
+  const [paid, setPaid] = useState(false);
 
-  // Step 1: Demo payment confirmation
+  // Step 1: Validate + Payment confirmation
   const handlePayment = () => {
+    // ✅ Check required fields BEFORE allowing payment
+    if (!name || !phone || !address || !bookingDate) {
+      alert("⚠️ Please fill all required fields before proceeding to payment.");
+      return;
+    }
+
+    if (phone.length !== 10) {
+      alert("⚠️ Phone number must be exactly 10 digits");
+      return;
+    }
+
     const confirm = window.confirm(
       `💳 Pay ₹${selectedService.price} for ${selectedService.name}?`
     );
@@ -37,17 +47,12 @@ export default function BookingPage() {
     }
   };
 
-  // Step 2: Booking after payment
+  // Step 2: Submit booking after payment
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!paid) {
       alert("⚠️ Please complete payment before booking!");
-      return;
-    }
-
-    if (phone.length !== 10) {
-      alert("⚠️ Phone number must be exactly 10 digits");
       return;
     }
 
@@ -61,6 +66,7 @@ export default function BookingPage() {
         phone,
         address,
       });
+
       alert(`✅ Booking created for ${selectedService.name}. Check your email.`);
       navigate("/dashboard");
     } catch (err) {
@@ -105,7 +111,7 @@ export default function BookingPage() {
               required
               type="tel"
               value={phone}
-              onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))} // only digits
+              onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
               className="mt-1 p-2 border w-full rounded"
               pattern="^\d{10}$"
               maxLength="10"
