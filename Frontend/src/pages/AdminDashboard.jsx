@@ -7,7 +7,8 @@ export default function AdminDashboard() {
   const [workers, setWorkers] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("bookings"); // bookings | workers
+  const [services, setServices] = useState([]);
+  const [activeTab, setActiveTab] = useState("bookings"); // bookings | workers | services
   const navigate = useNavigate();
   const [name, setName] = useState("");
 const [email, setEmail] = useState("");
@@ -56,11 +57,22 @@ const [email, setEmail] = useState("");
     }
   };
 
+  // ✅ Fetch Services
+  const fetchServices = async () => {
+    try {
+      const { data } = await API.get("/services");
+      setServices(data);
+    } catch (err) {
+      console.error("Error fetching services:", err);
+      alert("Failed to load services");
+    }
+  };
 
   useEffect(() => {
     fetchBookings();
     fetchWorkers();
     fetchAdminProfile();
+    fetchServices();
   }, []);
 
   // Booking Status Change
@@ -153,6 +165,14 @@ const [email, setEmail] = useState("");
             }`}
           >
             Worker Management
+          </button>
+           <button
+            onClick={() => setActiveTab("services")}
+            className={`w-full text-left px-4 py-2 rounded hover:bg-gray-700 ${
+              activeTab === "services" ? "bg-gray-700" : ""
+            }`}
+          >
+            Service Management
           </button>
           <button className="w-full text-left px-4 py-2 rounded hover:bg-gray-700">
            <ul
@@ -393,6 +413,174 @@ const [email, setEmail] = useState("");
     </div>
   </>
 )}
+
+
+{/* Service Management Section */}
+{activeTab === "services" && (
+  <div>
+    <h1 className="text-4xl font-bold mb-6 bg-gradient-to-r from-orange-600 via-pink-600 to-purple-600 text-transparent bg-clip-text">
+      Manage Services
+    </h1>
+
+   {/* ====== Add Service Form ====== */}
+<div className="bg-white p-6 rounded-lg shadow-md mb-8">
+  <h2 className="text-2xl font-semibold mb-4 text-gray-700">
+    Add New Service
+  </h2>
+  <form
+    onSubmit={(e) => {
+      e.preventDefault();
+
+      const newService = {
+        name: e.target.name.value,
+        description: e.target.description.value,
+        price: parseFloat(e.target.price.value),
+        icon: e.target.icon.value,
+        image: e.target.image.value, // ✅ Capture image URL
+      };
+
+      API.post("/services", newService)
+        .then(() => {
+          fetchServices();
+          e.target.reset();
+        })
+        .catch((err) => console.error("Failed to add service:", err));
+    }}
+    className="grid grid-cols-1 md:grid-cols-2 gap-4"
+  >
+    {/* Service Name */}
+    <input
+      type="text"
+      name="name"
+      placeholder="Service Name"
+      required
+      className="border p-2 rounded"
+    />
+
+    {/* Service Icon */}
+    <select
+      name="icon"
+      required
+      className="border p-2 rounded w-full"
+    >
+      <option value="">-- Select Icon --</option>
+      <option value="🧹">🧹 Cleaning</option>
+      <option value="🔧">🔧 Plumbing</option>
+      <option value="💡">💡 Electrician</option>
+      <option value="🚚">🚚 Moving/Delivery</option>
+      <option value="🛠️">🛠️ Repairs</option>
+      <option value="👷">👷 Labour</option>
+      <option value="🧺">🧺 Laundry</option>
+      <option value="🍽️">🍽️ Cooking</option>
+      <option value="🧴">🧴 Housekeeping</option>
+    </select>
+
+    {/* Image URL */}
+    <input
+      type="text"
+      name="image"
+      placeholder="Image URL (e.g. https://...)"
+      required
+      className="border p-2 rounded md:col-span-2"
+    />
+
+    {/* Description */}
+    <textarea
+      name="description"
+      placeholder="Service Description"
+      rows="2"
+      className="border p-2 rounded md:col-span-2"
+    ></textarea>
+
+    {/* Price */}
+    <input
+      type="number"
+      name="price"
+      placeholder="Price (₹)"
+      min="0"
+      step="0.01"
+      required
+      className="border p-2 rounded"
+    />
+
+    {/* Submit Button */}
+    <button
+      type="submit"
+      className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition md:col-span-2"
+    >
+      ➕ Add Service
+    </button>
+  </form>
+</div>
+
+
+
+    {/* ====== Service List ====== */}
+{services.length === 0 ? (
+  <p className="text-center text-gray-500 mt-6">
+    No services available. Please add a new service.
+  </p>
+) : (
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {services.map((service) => (
+      <div
+        key={service._id}
+        className="p-4 bg-white rounded-xl shadow-md flex flex-col items-center hover:shadow-xl transition-all duration-300"
+      >
+        {/* Icon */}
+        <div className="text-5xl mb-2">{service.icon || "🛠️"}</div>
+
+        {/* Name */}
+        <h2 className="font-bold text-xl mb-2 text-center">{service.name}</h2>
+
+        {/* Image */}
+        {service.image ? (
+          <img
+            src={service.image}
+            alt={service.name}
+            className="w-full h-48 object-cover rounded-lg mb-2"
+          />
+        ) : (
+          <div className="flex items-center justify-center h-48 w-full text-6xl bg-gray-100 rounded-lg mb-2">
+            {service.icon || "🛠️"}
+          </div>
+        )}
+
+        {/* Description */}
+        <p className="text-gray-600 text-sm text-center mb-2">
+          {service.description || "No description available."}
+        </p>
+
+        {/* Price */}
+        <p className="mt-1 text-green-600 font-semibold">
+          {service.price > 0 ? `₹${service.price}` : "Free"}
+        </p>
+
+        {/* Delete Button */}
+        <button
+          onClick={() => {
+            if (
+              window.confirm(`Are you sure you want to delete ${service.name}?`)
+            ) {
+              API.delete(`/services/${service._id}`)
+                .then(fetchServices)
+                .catch((err) =>
+                  console.error("Failed to delete service:", err)
+                );
+            }
+          }}
+          className="mt-3 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors duration-200"
+        >
+          🗑 Delete
+        </button>
+      </div>
+    ))}
+  </div>
+)}
+  
+  </div>
+)}
+
 
       </div>
     </div>

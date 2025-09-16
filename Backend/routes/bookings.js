@@ -33,7 +33,7 @@ router.post("/", createBooking);
 
 // Get logged-in user’s bookings
 router.get("/my", getUserBookings);
-
+router.get("/bookings/my", getUserBookings)
 // Admin: get all bookings
 router.get("/", admin, getAllBookings);
 

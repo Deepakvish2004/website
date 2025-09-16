@@ -60,6 +60,12 @@ export default function WorkerDashboard() {
       console.error("Error updating status:", err);
     }
   };
+  // Logout handler
+  const handleLogout = () => {
+    localStorage.removeItem("worker");
+    localStorage.removeItem("workerToken");
+    window.location.href = "/worker/login"; // redirect to worker login page
+  };
 
   const displayedBookings = showAllAssignments
     ? bookings
@@ -115,6 +121,13 @@ export default function WorkerDashboard() {
           className="py-2 px-4 m-3 bg-indigo-500 rounded hover:bg-indigo-600 transition"
         >
           {showAllAssignments ? "Show New Only" : "My Assignments"}
+        </button>
+        {/* Logout button */}
+        <button
+          onClick={handleLogout}
+          className="py-2 px-4 mt-4 bg-red-500 rounded hover:bg-red-600 transition text-white font-semibold"
+        >
+          Logout
         </button>
       </aside>
 

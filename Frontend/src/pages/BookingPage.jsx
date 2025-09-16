@@ -13,21 +13,18 @@ export default function BookingPage() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Service details (from router state or fallback)
   const selectedService =
-    location.state || fallbackServices[service] || { name: "Service", price: 0 };
+    location.state || fallbackServices[service] || { name: "", price: 0 };
 
-  // Form states
   const [bookingDate, setBookingDate] = useState("");
   const [details, setDetails] = useState("");
+  const [price, setPrice] = useState(selectedService.price);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [paid, setPaid] = useState(false);
 
-  // Step 1: Validate + Payment confirmation
   const handlePayment = () => {
-    // ✅ Check required fields BEFORE allowing payment
     if (!name || !phone || !address || !bookingDate) {
       alert("⚠️ Please fill all required fields before proceeding to payment.");
       return;
@@ -38,19 +35,14 @@ export default function BookingPage() {
       return;
     }
 
-    const confirm = window.confirm(
-      `💳 Pay ₹${selectedService.price} for ${selectedService.name}?`
-    );
-    if (confirm) {
+    if (window.confirm(`💳 Pay ₹${selectedService.price} for ${selectedService.name}?`)) {
       setPaid(true);
       alert("✅ Payment successful (demo)");
     }
   };
 
-  // Step 2: Submit booking after payment
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!paid) {
       alert("⚠️ Please complete payment before booking!");
       return;
@@ -101,6 +93,7 @@ export default function BookingPage() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="mt-1 p-2 border w-full rounded"
+              disabled={paid}
             />
           </label>
 
@@ -116,6 +109,18 @@ export default function BookingPage() {
               pattern="^\d{10}$"
               maxLength="10"
               title="Enter exactly 10 digits"
+              disabled={paid}
+            />
+          </label>
+
+          {/* Price (readonly) */}
+          <label className="block">
+            <span className="text-gray-700">Price</span>
+            <input
+              type="text"
+              value={selectedService.price}
+              readOnly
+              className="mt-1 p-2 border w-full rounded bg-gray-100"
             />
           </label>
 
@@ -128,6 +133,7 @@ export default function BookingPage() {
               onChange={(e) => setAddress(e.target.value)}
               className="mt-1 p-2 border w-full rounded"
               placeholder="Enter your address"
+              disabled={paid}
             />
           </label>
 
@@ -141,6 +147,7 @@ export default function BookingPage() {
               onChange={(e) => setBookingDate(e.target.value)}
               min={new Date().toISOString().slice(0, 16)}
               className="mt-1 p-2 border w-full rounded"
+              disabled={paid}
             />
           </label>
 
@@ -152,10 +159,10 @@ export default function BookingPage() {
               onChange={(e) => setDetails(e.target.value)}
               className="mt-1 p-2 border w-full rounded"
               placeholder="Any special instructions?"
+              disabled={paid}
             />
           </label>
 
-          {/* Payment + Submit */}
           {!paid ? (
             <button
               type="button"

@@ -19,6 +19,10 @@ app.use('/api/workers', workerRoutes);
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/bookings', require('./routes/bookings'));
 
+const serviceRoutes = require("./routes/serviceRoutes");
+app.use("/api/services", serviceRoutes);
+
+
 const feedbackRoutes = require('./routes/feedbackRoutes');
 app.use('/api/feedback', feedbackRoutes);
 

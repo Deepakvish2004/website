@@ -69,8 +69,8 @@ exports.createBooking = asyncHandler(async (req, res) => {
 exports.getUserBookings = asyncHandler(async (req, res) => {
   try {
     const bookings = await Booking.find({ user: req.user._id })
-      .populate("assignedWorker", "name email phone services age gender")
-      .populate("user", "name email phone address age gender") // ✅ Populate user properly
+      .populate("assignedWorker", "name email phone services age gender price")
+      .populate("user", "name email phone address age gender price") // ✅ Populate user properly
       .sort({ createdAt: -1 });
 
     res.json(bookings);
@@ -114,8 +114,8 @@ exports.cancelBooking = asyncHandler(async (req, res) => {
 exports.getAllBookings = asyncHandler(async (req, res) => {
   try {
     const bookings = await Booking.find()
-      .populate("user", "name email phone address")
-      .populate("assignedWorker", "name email phone services age gender")
+      .populate("user", "name email phone address price")
+      .populate("assignedWorker", "name email phone services age gender price")
       .sort({ createdAt: -1 });
 
     res.json(bookings);

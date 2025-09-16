@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const bookingSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   service: { type: String, required: true },
-  price: { type: Number, required: true, default: 0 },
+  price: { type: Number,  default: 0 },
   details: { type: String },
   bookingDate: { type: Date, required: true },
   status: {
@@ -29,6 +29,7 @@ const bookingSchema = new mongoose.Schema({
   completedAt: { type: Date },
 
   // Extra user details
+  price: { type: Number, required: true },
   name: { type: String, required: true },
   phone: { type: String, required: true },
   address: { type: String, required: true },

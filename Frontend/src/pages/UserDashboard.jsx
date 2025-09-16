@@ -69,6 +69,7 @@ export default function UserDashboard() {
     try {
       const res = await API.get("/bookings/my");
       setBookings(res.data);
+      console.log(res)
     } catch (err) {
       console.error("Error fetching bookings:", err);
     } finally {

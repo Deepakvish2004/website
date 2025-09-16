@@ -1,67 +1,86 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import cleaner from '../assets/cleaner.jpg';
-import washing from '../assets/washing.jpg';
-import cleaners from '../assets/cleaners.jpg';
+import React, { useEffect, useState } from "react";
+import API from "../api/axios";
+import { Link } from "react-router-dom";
 
-const services = [
-  { id: 'cleaners', name: 'Cleaners', desc: 'Home cleaning service', image: cleaner, price: 200 },
-  { id: 'helper',  name: 'Helper',  desc: 'Daily helper',           image: cleaners, price: 150 },
-  { id: 'washing', name: 'Washing', desc: 'Laundry service',        image: washing, price: 100 }
-];
+import Bg from "../assets/bg.jpg";
 
-export default function Services({ user }) {
-  const navigate = useNavigate();
+export default function ServicesPage() {
+  const [services, setServices] = useState([]);
 
-  const handleBook = (service) => {
-    if (user) {
-      // ✅ User logged in → go to booking page
-      navigate(`/book/${service.id}`, {
-        state: { id: service.id, name: service.name, price: service.price }
-      });
-    } else {
-      // ❌ Not logged in → go to login
-      navigate('/login');
-    }
-  };
+  const gradients = [
+    "from-pink-100 via-pink-50 to-rose-100",
+    "from-purple-100 via-violet-50 to-indigo-100",
+    "from-blue-100 via-cyan-50 to-sky-100",
+    "from-green-100 via-emerald-50 to-lime-100",
+    "from-yellow-100 via-amber-50 to-orange-100",
+    "from-red-100 via-rose-50 to-pink-100",
+  ];
+
+  useEffect(() => {
+    API.get("/services")
+      .then((res) => setServices(res.data))
+      .catch((err) => console.error(err));
+  }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 p-8 relative overflow-hidden">
-      {/* Overlay blur effect */}
-      <div className="absolute inset-0 bg-white/20 backdrop-blur-sm"></div>
+    <div 
+   // className="min-h-screen bg-gradient-to-br from-violet-500 rounded-lg to-green-100 py-10 px-4"
+   className="min-h-screen rounded-lg py-10 px-4 bg-cover bg-center bg-no-repeat"
+  style={{
+    backgroundImage: `url(${Bg})`,
+  }}
+    >
+      <h1 className="text-4xl font-extrabold text-center mb-10 text-transparent bg-clip-text bg-gradient-to-r from-purple-700 to-indigo-700 drop-shadow-lg">
+        ✨ Explore Our Services
+      </h1>
 
-      <h2 className="text-5xl font-extrabold text-white mb-8 text-center relative z-10 drop-shadow-lg">
-        Our Services
-      </h2>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative z-10">
-        {services.map((s) => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 max-w-6xl mx-auto">
+        {services.map((service, index) => (
           <div
-            key={s.id}
-            className="p-[3px] rounded-xl bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-600 hover:scale-105 transform transition duration-300"
+            key={service._id}
+            className={`relative bg-gradient-to-br ${
+              gradients[index % gradients.length]
+            } rounded-3xl shadow-xl hover:shadow-2xl transition transform hover:scale-105 duration-300 flex flex-col items-center border border-gray-200`}
           >
-            {/* Inner card */}
-            <div className="relative p-6 bg-white rounded-xl shadow-lg h-full">
-              <img
-                src={s.image}
-                alt={s.name}
-                className="w-full h-40 object-cover rounded-lg"
-              />
-              <h3 className="text-2xl font-bold text-gray-800 mt-4">{s.name}</h3>
-              <p className="text-gray-600">{s.desc}</p>
+            {/* Header Badge */}
+            <div className="absolute -top-4 px-6 py-1 rounded-full bg-white shadow-md text-gray-700 font-bold text-lg border">
+              {service.name}
+            </div>
 
-              {/* PRICE */}
-              <p className="text-lg font-semibold text-green-700 mt-2">
-                ₹{s.price}
+            {/* Image Showcase */}
+            <div className="mt-8 flex justify-center items-center">
+              {service.image ? (
+                <img
+                  src={service.image}
+                  alt={service.name}
+                  className="w-44 h-44 object-contain rounded-full border-4 border-white shadow-lg bg-white backdrop-blur-md"
+                />
+              ) : (
+                <div className="flex items-center justify-center w-44 h-44 rounded-full border-4 border-white bg-gray-50 text-7xl shadow-md">
+                  {service.icon}
+                </div>
+              )}
+            </div>
+
+            {/* Content */}
+            <div className="p-6 w-full text-center">
+              <p className="text-gray-700 text-sm mt-2 line-clamp-3">
+                {service.description}
               </p>
 
-              {/* BOOK NOW button */}
-              <button
-                onClick={() => handleBook(s)}
-                className="mt-4 inline-block text-sm text-blue-600 font-semibold hover:underline"
-              >
-                Book now
-              </button>
+              <div className="mt-4 flex flex-col items-center gap-2">
+                <span className="text-2xl font-extrabold text-green-700">
+                  ₹ {service.price}
+                </span>
+
+                <Link
+                  to={`/book/${service._id}`}
+                  state={service}
+                  className="mt-3 px-6 py-3 w-40 text-center rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-semibold shadow-lg hover:from-violet-700 hover:to-indigo-700 transition transform hover:scale-105"
+                >
+                  Book Now 🚀
+                </Link>
+              </div>
             </div>
           </div>
         ))}

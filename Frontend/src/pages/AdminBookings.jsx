@@ -223,7 +223,9 @@
                           <span className="text-green-700 font-semibold">
                             Assigned
                           </span>
-                        ) : (
+                        ) : b.status === "completed" ? (
+                           <span className="text-blue-700 font-semibold">✅ Done</span>
+                          ) : (
                           <span className="text-red-700 font-semibold">
                             Cancelled
                           </span>
