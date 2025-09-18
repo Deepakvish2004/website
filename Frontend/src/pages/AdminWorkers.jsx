@@ -261,7 +261,7 @@ export default function AdminWorkers() {
                   )}
                 </td>
                 <td className="p-3 text-center space-x-2">
-                  {w.status === "pending" && (
+                  {/* {w.status === "pending" && (
                     <>
                       <button
                         onClick={() => handleStatusChange(w._id, "approved")}
@@ -276,7 +276,7 @@ export default function AdminWorkers() {
                         Reject
                       </button>
                     </>
-                  )}
+                  )} */}
                   <button
                     onClick={() => handleDelete(w._id)}
                     className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition"

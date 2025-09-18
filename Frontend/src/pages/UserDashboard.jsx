@@ -69,7 +69,6 @@ export default function UserDashboard() {
     try {
       const res = await API.get("/bookings/my");
       setBookings(res.data);
-      console.log(res)
     } catch (err) {
       console.error("Error fetching bookings:", err);
     } finally {
@@ -84,56 +83,56 @@ export default function UserDashboard() {
   }, []);
 
   // Cancel booking
-  const handleCancel = async (id) => {
-    if (!window.confirm("Are you sure you want to cancel this booking?")) return;
-    try {
-      await API.put(`/bookings/${id}/cancel`);
-      setBookings(prev =>
-        prev.map(b => b._id === id ? { ...b, status: "cancelled" } : b)
-      );
-      alert("✅ Booking cancelled");
-    } catch (err) {
-      console.error(err);
-      alert(err.response?.data?.message || "Failed to cancel booking");
-    }
-  };
+  // const handleCancel = async (id) => {
+  //   if (!window.confirm("Are you sure you want to cancel this booking?")) return;
+  //   try {
+  //     await API.put(`/bookings/${id}/cancel`);
+  //     setBookings(prev =>
+  //       prev.map(b => b._id === id ? { ...b, status: "cancelled" } : b)
+  //     );
+  //     alert("✅ Booking cancelled");
+  //   } catch (err) {
+  //     console.error(err);
+  //     alert(err.response?.data?.message || "Failed to cancel booking");
+  //   }
+  // };
 
   // Approve completed work
-  const handleApprove = async (id) => {
-    if (!window.confirm("Approve this work as completed?")) return;
-    try {
-      await API.put(`/bookings/${id}/approve`);
-      setBookings(prev =>
-        prev.map(b =>
-          b._id === id ? { ...b, status: "completed", userApproval: true } : b
-        )
-      );
-      alert("🎉 Booking marked as completed!");
-    } catch (err) {
-      console.error(err);
-      alert(err.response?.data?.message || "Failed to approve work");
-    }
-  };
+  // const handleApprove = async (id) => {
+  //   if (!window.confirm("Approve this work as completed?")) return;
+  //   try {
+  //     await API.put(`/bookings/${id}/approve`);
+  //     setBookings(prev =>
+  //       prev.map(b =>
+  //         b._id === id ? { ...b, status: "completed", userApproval: true } : b
+  //       )
+  //     );
+  //     alert("🎉 Booking marked as completed!");
+  //   } catch (err) {
+  //     console.error(err);
+  //     alert(err.response?.data?.message || "Failed to approve work");
+  //   }
+  // };
 
   // Mark booking as SUCCESSFUL
-  const handleMarkSuccessful = async (id) => {
-    if (!window.confirm("Mark this booking as SUCCESSFUL?")) return;
+  // const handleMarkSuccessful = async (id) => {
+  //   if (!window.confirm("Mark this booking as SUCCESSFUL?")) return;
 
-    try {
-      const res = await API.put(`/bookings/${id}/success`);
-      const updatedBooking = res.data.booking;
+  //   try {
+  //     const res = await API.put(`/bookings/${id}/success`);
+  //     const updatedBooking = res.data.booking;
 
-      setBookings(prev =>
-        prev.map(b => b._id === id ? { ...b, status: updatedBooking.status } : b)
-      );
-      alert("🎊 Booking marked as SUCCESSFUL!");
-      console.log("Booking marked as SUCCESSFUL:", updatedBooking);
-    } catch (err) {
-      console.error(err);
-      alert(err.response?.data?.message || "Failed to mark as SUCCESSFUL");
-      console
-    }
-  };
+  //     setBookings(prev =>
+  //       prev.map(b => b._id === id ? { ...b, status: updatedBooking.status } : b)
+  //     );
+  //     alert("🎊 Booking marked as SUCCESSFUL!");
+  //     console.log("Booking marked as SUCCESSFUL:", updatedBooking);
+  //   } catch (err) {
+  //     console.error(err);
+  //     alert(err.response?.data?.message || "Failed to mark as SUCCESSFUL");
+  //     console
+  //   }
+  // };
 
   if (loading) return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r rounded-lg from-blue-600 via-purple-600 to-pink-600 text-white text-lg font-semibold">
@@ -206,7 +205,7 @@ export default function UserDashboard() {
                   ✅ Approve Completion
                 </button>
               )}
-
+{/* 
               {b.status === "completed" && (
                 <button
                   onClick={() => handleMarkSuccessful(b._id)}
@@ -214,7 +213,7 @@ export default function UserDashboard() {
                 >
                   🎉 Mark as SUCCESSFUL
                 </button>
-              )}
+              )} */}
 
               {/* Feedback */}
               {(b.status === "completed" || b.status === "SUCCESSFUL") && (

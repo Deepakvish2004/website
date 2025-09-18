@@ -4,6 +4,7 @@ const User = require("../models/User"); // ✅ Make sure User model is imported
 const Worker = require("../models/Worker");
 const nodemailer = require("nodemailer");
 const e = require("express");
+const Service = require("../models/Service")
 
 // ================== MAIL TRANSPORTER ==================
 const transporter = nodemailer.createTransport({
@@ -28,10 +29,33 @@ exports.createBooking = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "Booking date must be in the future" });
   }
 
+  // ✅ Fetch service details from DB instead of hardcoding price
+  const selectedService = await Service.findOne({
+    name: service, // Match service by name
+    isActive: true // Ensure service is active
+  });
+
+  if (!selectedService) {
+    return res.status(404).json({ message: "Selected service not found or inactive" });
+  }
+
+  const prices = selectedService.price; // ✅ Get price dynamically from DB
+
+
   const SERVICE_PRICES = {
-    cleaners: 200,
-    helper: 150,
-    washing: 100,
+    Cleaners: prices,
+    Washing: prices,
+    Electrical: prices,
+    Carpentry: prices,
+    Plumber: prices,
+    Laundry: prices,
+    Cooking: prices,
+    Housekeeping: prices,
+    Labour: prices,
+    Electrician: prices,
+    Delivery: prices,
+    Repairing: prices,
+    
   };
 
   const price = SERVICE_PRICES[service] || 0;

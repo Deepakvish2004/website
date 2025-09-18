@@ -183,6 +183,16 @@ const [email, setEmail] = useState("");
 </ul>
 
           </button>
+          <button className="w-full text-left px-4 py-2 rounded hover:bg-gray-700">
+           <ul
+  onClick={() => navigate("/admin/contacts")}
+  className=""
+>
+  Contacts
+</ul>
+
+          </button>
+          
         </nav>
         <div className="mt-auto">
           <button
@@ -452,7 +462,7 @@ const [email, setEmail] = useState("");
     <input
       type="text"
       name="name"
-      placeholder="Service Name"
+      placeholder="Service Name (e.g. Cleaners,Washing,Plumber,Electrician,Delivery,Repairing,Laundry,Labour,Cooking,Housekeeping etc.)"
       required
       className="border p-2 rounded"
     />

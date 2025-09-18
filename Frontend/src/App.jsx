@@ -16,6 +16,9 @@ import AdminLogin from "./pages/AdminLogin";
 import Navbar from './components/Navbar';
 import AdminReports from "./pages/AdminReports";
 import WorkerRegistration from "./pages/WorkerRegistration";
+import AboutPage from './components/Aboutpage';
+import ContactPage from './components/ContactPage';
+import AdminContacts from "./pages/AdminContacts";
 
 function getUserFromStorage() {
   try {
@@ -106,11 +109,16 @@ function App() {
           />
 
           
-
+            <Route path="/admin/contacts" element={<AdminContacts />} />
           {/* Worker routes (optional protection if needed later) */}
           <Route path="/worker/login" element={<WorkerLogin />} />
           <Route path="/worker/dashboard" element={<WorkerDashboard />} />
           <Route path="/worker/register" element={<WorkerRegistration />} />
+          
+
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+
 
           {/* Admin login (public) */}
           <Route path="/admin/login" element={<AdminLogin />} />

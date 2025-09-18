@@ -64,7 +64,7 @@ export default function ServicesPage() {
 
             {/* Content */}
             <div className="p-6 w-full text-center">
-              <p className="text-gray-700 text-sm mt-2 line-clamp-3">
+              <p className="text-gray-700 text-sm mt-2 font-bold line-clamp-3">
                 {service.description}
               </p>
 

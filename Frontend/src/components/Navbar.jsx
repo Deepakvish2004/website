@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
+import logo from "../assets/logo.png";
 
 export default function Navbar({ user, logout }) {
   const [openDropdown, setOpenDropdown] = useState(false);
   const dropdownRef = useRef(null);
-
-  // Dummy state to trigger auto-refresh
   const [tick, setTick] = useState(0);
 
   // Close dropdown if clicked outside
@@ -19,29 +18,34 @@ export default function Navbar({ user, logout }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Auto-refresh every 30 seconds (update tick state)
+  // Auto-refresh every 30 seconds
   useEffect(() => {
     const interval = setInterval(() => {
-      setTick(prev => prev + 1); // triggers re-render
-    }, 30000); // 30000ms = 30 seconds
+      setTick((prev) => prev + 1);
+    }, 30000);
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <nav className="bg-gradient-to-r from-violet-300 border-5 border-violet-600 hover:border-black rounded-lg to-indigo-300 shadow-md p-4 flex justify-between items-center relative">
+    <nav className="sticky top-0 z-50 bg-gradient-to-r rounded-lg from-violet-200 to-indigo-200 backdrop-blur-md bg-opacity-80 shadow-lg p-4 flex justify-between items-center transition-all duration-300">
       {/* Left Side */}
-      <div className="flex items-center gap-6">
-        <Link
-          to="/"
-          className="font-extrabold text-2xl text-white tracking-wide hover:text-green-300 transition"
-        >
-          Hand Services
+      <div className="flex items-center gap-4">
+        {/* Logo + Brand */}
+        <Link to="/" className="flex items-center gap-2 group">
+          <img
+            src={logo}
+            alt="Hand Logo"
+            className="h-12 w-12 rounded-full shadow-md group-hover:scale-105 transition-transform"
+          />
+          <span className="font-bold text-2xl text-violet-900 tracking-wide group-hover:text-violet-700 transition">
+            Hand
+          </span>
         </Link>
 
         {!user && (
           <Link
             to="/services"
-            className="text-white text-sm hover:text-yellow-800 transition"
+            className="text-violet-900 text-sm font-medium hover:text-violet-600 transition"
           >
             Services
           </Link>
@@ -57,8 +61,8 @@ export default function Navbar({ user, logout }) {
               <button
                 onClick={() => setOpenDropdown(!openDropdown)}
                 className="flex items-center gap-1 text-sm font-semibold px-4 py-2 rounded-full 
-                  bg-white text-violet-700 border-2 border-violet-600 shadow-md
-                  hover:bg-violet-600 hover:text-white transition duration-200"
+                  bg-white text-violet-700 shadow-md hover:shadow-lg
+                  hover:bg-violet-600 hover:text-white transition-all duration-200"
               >
                 Login
                 <span
@@ -71,24 +75,24 @@ export default function Navbar({ user, logout }) {
               </button>
 
               {openDropdown && (
-                <div className="absolute right-0 mt-2 w-44 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden animate-fadeIn z-50">
+                <div className="absolute right-0 mt-2 w-44 bg-white border border-gray-100 rounded-xl shadow-lg overflow-hidden animate-fadeIn z-50">
                   <Link
                     to="/login"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-violet-100"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-violet-50 transition"
                     onClick={() => setOpenDropdown(false)}
                   >
                     👤 User Login
                   </Link>
                   <Link
                     to="/worker/login"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-violet-100"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-violet-50 transition"
                     onClick={() => setOpenDropdown(false)}
                   >
                     🛠 Worker Login
                   </Link>
                   <Link
                     to="/admin/login"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-violet-100"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-violet-50 transition"
                     onClick={() => setOpenDropdown(false)}
                   >
                     🔑 Admin Login
@@ -100,8 +104,8 @@ export default function Navbar({ user, logout }) {
             <Link
               to="/register"
               className="text-sm font-semibold px-4 py-2 rounded-full 
-                bg-white text-violet-700 border-2 border-violet-600 shadow-md
-                hover:bg-violet-600 hover:text-white transition duration-200"
+                bg-white text-violet-700 shadow-md hover:shadow-lg
+                hover:bg-violet-600 hover:text-white transition-all duration-200"
             >
               Register
             </Link>
@@ -114,7 +118,7 @@ export default function Navbar({ user, logout }) {
               <Link
                 to="/dashboard"
                 className="text-sm font-semibold px-4 py-2 rounded-full 
-                  bg-white text-violet-700 border-2 border-violet-600 shadow-md
+                  bg-white text-violet-700 shadow-md hover:shadow-lg
                   hover:bg-violet-600 hover:text-white transition"
               >
                 My Bookings
@@ -126,7 +130,7 @@ export default function Navbar({ user, logout }) {
                 <Link
                   to="/admin"
                   className="text-sm font-semibold px-4 py-2 rounded-full 
-                    bg-white text-violet-700 border-2 border-violet-600 shadow-md
+                    bg-white text-violet-700 shadow-md hover:shadow-lg
                     hover:bg-violet-600 hover:text-white transition"
                 >
                   Admin
@@ -134,7 +138,7 @@ export default function Navbar({ user, logout }) {
                 <Link
                   to="/admin/workers"
                   className="text-sm font-semibold px-4 py-2 rounded-full 
-                    bg-white text-violet-700 border-2 border-violet-600 shadow-md
+                    bg-white text-violet-700 shadow-md hover:shadow-lg
                     hover:bg-violet-600 hover:text-white transition"
                 >
                   Create Worker
@@ -146,7 +150,7 @@ export default function Navbar({ user, logout }) {
             <button
               onClick={logout}
               className="text-sm font-semibold px-4 py-2 rounded-full 
-                bg-white text-red-700 border-2 border-red-600 shadow-md
+                bg-white text-red-700 shadow-md hover:shadow-lg
                 hover:bg-red-600 hover:text-white transition"
             >
               Logout

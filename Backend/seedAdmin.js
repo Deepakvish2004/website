@@ -9,15 +9,15 @@ const seedAdmin = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI);
 
-    const adminExists = await User.findOne({ email: "adminperson@gmail.com" });
+    const adminExists = await User.findOne({ email: "admin@gmail.com" });
     if (adminExists) {
       console.log("Admin already exists:", adminExists.email);
       process.exit();
     }
 
     const admin = await User.create({
-      name: "Super Admin",
-      email: "adminperson@gmail.com",
+      name: "Admin",
+      email: "admin@gmail.com",
       password: "admin", // plain password, will be hashed by pre-save
       role: "admin",
     });
