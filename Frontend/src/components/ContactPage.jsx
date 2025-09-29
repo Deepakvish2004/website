@@ -1,12 +1,16 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import API from "../api/axios"; // <-- make sure axios baseURL is set correctly
-import { Link } from "react-router-dom";
+import API from "../api/axios";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
+
+  const navigate = useNavigate();
+  const isLoggedIn = !!localStorage.getItem("token"); // ✅ check login
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -14,34 +18,42 @@ export default function ContactPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setSuccess("");
+
+    // ✅ Restrict message sending if user is NOT logged in
+    if (!isLoggedIn) {
+      toast.error("⚠️ Please log in to send a message.");
+      navigate("/login"); // optional: redirect to login page
+      return;
+    }
+
+    setLoading(true);
 
     try {
       await API.post("/contact", formData);
-      setSuccess("Your message has been sent successfully!");
+      setSuccess("✅ Your message has been sent successfully!");
       setFormData({ name: "", email: "", message: "" });
     } catch (err) {
       console.error("Error submitting contact form:", err);
-      setSuccess("Something went wrong. Please try again.");
+      setSuccess("❌ Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-between bg-gradient-to-br from-gray-50 to-gray-200">
+    <div className="min-h-screen flex rounded-lg flex-col items-center justify-between bg-gradient-to-br from-gray-50 to-gray-200">
       {/* Contact Form Section */}
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.7 }}
-        className="max-w-lg w-full bg-white shadow-xl rounded-2xl p-10 mt-10"
+        className="max-w-lg w-full bg-white shadow-xl border border-yellow-500 rounded-2xl p-10 mt-10"
       >
-        <h1 className="text-3xl font-bold text-gray-800 mb-4 text-center">
+        <h1 className="text-3xl font-bold shadow-xl text-gray-800 mb-4 text-center">
           Contact Us
         </h1>
-        <p className="text-gray-600 text-center mb-6">
+        <p className="text-gray-600 font-bold text-center mb-6 italic">
           Have questions or feedback? We'd love to hear from you!
         </p>
 
@@ -90,6 +102,12 @@ export default function ContactPage() {
             {loading ? "Sending..." : "Send Message"}
           </motion.button>
         </form>
+
+        {!isLoggedIn && (
+          <p className="mt-4 text-center text-red-500 text-sm">
+            🔒 You must be logged in to send messages.
+          </p>
+        )}
       </motion.div>
 
       {/* Footer */}

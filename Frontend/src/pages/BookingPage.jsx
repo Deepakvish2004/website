@@ -37,23 +37,38 @@ export default function BookingPage() {
   const [paid, setPaid] = useState(false);
   const [showPaymentCard, setShowPaymentCard] = useState(false);
 
-  // ✅ Track validation errors
+  // Track validation errors
   const [errors, setErrors] = useState({});
+
+  // Function to get minimum datetime in local timezone
+  const getMinDateTime = () => {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    return now.toISOString().slice(0, 16); // YYYY-MM-DDTHH:MM
+  };
 
   const validateFields = () => {
     const newErrors = {};
+    const now = new Date();
+
     if (!name.trim()) newErrors.name = "Name is required";
     if (!phone.trim()) newErrors.phone = "Phone number is required";
     else if (phone.length !== 10) newErrors.phone = "Phone must be exactly 10 digits";
     if (!address.trim()) newErrors.address = "Address is required";
     if (!bookingDate.trim()) newErrors.bookingDate = "Select a date & time";
+    else if (new Date(bookingDate) <= now) {
+      newErrors.bookingDate = "Cannot select past and present date or time";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  };
+  }; 
 
   const handlePayment = () => {
     if (!validateFields()) {
-      toast.error("⚠️ Please fill all required fields correctly!");
+      toast.error(
+        "⚠️ Please fill all required fields correctly and select a valid date/time!"
+      );
       return;
     }
     setShowPaymentCard(true);
@@ -106,7 +121,7 @@ export default function BookingPage() {
         background: "radial-gradient(circle at top right, #3b82f6, #6366f1, #8b5cf6)",
       }}
     >
-      {/* ✅ Premium Animated Payment Modal */}
+      {/* Payment Modal */}
       <AnimatePresence>
         {showPaymentCard && (
           <motion.div
@@ -135,7 +150,7 @@ export default function BookingPage() {
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ type: "spring", stiffness: 250, delay: 0.1 }}
-                className="flex justify-center  mb-4"
+                className="flex justify-center mb-4"
               >
                 <div className="bg-green-500 text-white w-16 h-16 rounded-full flex items-center justify-center shadow-lg">
                   ✅
@@ -166,7 +181,7 @@ export default function BookingPage() {
         )}
       </AnimatePresence>
 
-      {/* ✅ Booking Form */}
+      {/* Booking Form */}
       <div className="max-w-md w-full bg-white p-6 rounded-xl shadow-lg">
         <h2 className="text-2xl font-bold mb-4 text-center">
           Book: {selectedService.name}
@@ -181,7 +196,6 @@ export default function BookingPage() {
           <label className="block">
             <span className="text-gray-700">Your Name</span>
             <input
-              required
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -197,7 +211,6 @@ export default function BookingPage() {
           <label className="block">
             <span className="text-gray-700">Phone</span>
             <input
-              required
               type="tel"
               value={phone}
               onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
@@ -214,7 +227,6 @@ export default function BookingPage() {
           <label className="block">
             <span className="text-gray-700">Address</span>
             <textarea
-              required
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               className={`mt-1 p-2 border w-full rounded ${
@@ -232,15 +244,14 @@ export default function BookingPage() {
           <label className="block">
             <span className="text-gray-700">Date & Time</span>
             <input
-              required
               type="datetime-local"
               value={bookingDate}
               onChange={(e) => setBookingDate(e.target.value)}
-              min={new Date().toISOString().slice(0, 16)}
+              min={getMinDateTime()}
               className={`mt-1 p-2 border w-full rounded ${
                 errors.bookingDate ? "border-red-500" : ""
               }`}
-              disabled={paid}
+              disabled={paid} // Only disable after payment
             />
             {errors.bookingDate && (
               <span className="text-red-500 text-sm">{errors.bookingDate}</span>

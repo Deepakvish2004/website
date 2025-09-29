@@ -112,8 +112,14 @@ export default function Navbar({ user, logout }) {
           </>
         )}
 
-        {user && (
-          <>
+        {/* Logged-in User or Worker */}
+        {user && (user.role === "user" || user.role === "worker") && (
+          <div className="flex items-center gap-3">
+            {/* Name Badge */}
+            <span className="text-sm font-medium px-3 py-1 bg-violet-100 text-violet-900 rounded-full shadow-sm">
+              Hello, {user.name}
+            </span>
+
             {user.role === "user" && (
               <Link
                 to="/dashboard"
@@ -125,25 +131,15 @@ export default function Navbar({ user, logout }) {
               </Link>
             )}
 
-            {user.role === "admin" && (
-              <>
-                <Link
-                  to="/admin"
-                  className="text-sm font-semibold px-4 py-2 rounded-full 
-                    bg-white text-violet-700 shadow-md hover:shadow-lg
-                    hover:bg-violet-600 hover:text-white transition"
-                >
-                  Admin
-                </Link>
-                <Link
-                  to="/admin/workers"
-                  className="text-sm font-semibold px-4 py-2 rounded-full 
-                    bg-white text-violet-700 shadow-md hover:shadow-lg
-                    hover:bg-violet-600 hover:text-white transition"
-                >
-                  Create Worker
-                </Link>
-              </>
+            {user.role === "worker" && (
+              <Link
+                to="/worker/dashboard"
+                className="text-sm font-semibold px-4 py-2 rounded-full 
+                  bg-white text-violet-700 shadow-md hover:shadow-lg
+                  hover:bg-violet-600 hover:text-white transition"
+              >
+                My Tasks
+              </Link>
             )}
 
             {/* Logout button */}
@@ -155,7 +151,39 @@ export default function Navbar({ user, logout }) {
             >
               Logout
             </button>
-          </>
+          </div>
+        )}
+
+        {/* Admin Links */}
+        {user && user.role === "admin" && (
+          <div className="flex items-center gap-3">
+            <Link
+              to="/admin"
+              className="text-sm font-semibold px-4 py-2 rounded-full 
+                bg-white text-violet-700 shadow-md hover:shadow-lg
+                hover:bg-violet-600 hover:text-white transition"
+            >
+              Admin
+            </Link>
+            <Link
+              to="/admin/workers"
+              className="text-sm font-semibold px-4 py-2 rounded-full 
+                bg-white text-violet-700 shadow-md hover:shadow-lg
+                hover:bg-violet-600 hover:text-white transition"
+            >
+              Create Worker
+            </Link>
+
+            {/* Logout button for Admin */}
+            <button
+              onClick={logout}
+              className="text-sm font-semibold px-4 py-2 rounded-full 
+                bg-white text-red-700 shadow-md hover:shadow-lg
+                hover:bg-red-600 hover:text-white transition"
+            >
+              Logout
+            </button>
+          </div>
         )}
       </div>
     </nav>

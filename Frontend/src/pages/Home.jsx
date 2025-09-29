@@ -23,7 +23,7 @@ export default function Home() {
       </div>
      
     </div>
-        <div className="border-2 border-blue-600  rounded-b-lg shadow-lg ">
+        <div className="border-b-2 border-l-2 border-r-2 border-blue-600  rounded-b-lg shadow-lg ">
       <Design />
         </div>
         <div className="border-2 border-blue-600  rounded-lg shadow-lg">

@@ -17,7 +17,7 @@ app.use('/api/workers', workerRoutes);
 const contactRoutes = require("./routes/contact");
 app.use("/api/contact", contactRoutes);
 
-// routes
+
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/bookings', require('./routes/bookings'));
 

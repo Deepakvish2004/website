@@ -121,13 +121,18 @@ export default function AdminWorkers() {
             className="border p-2 rounded focus:ring focus:ring-indigo-300"
             required
           />
-          <input
-            name="phone"
-            value={form.phone}
-            onChange={handleChange}
-            placeholder="Phone"
-            className="border p-2 rounded focus:ring focus:ring-indigo-300"
-          />
+         <input
+  name="phone"
+  value={form.phone}
+  onChange={handleChange}
+  placeholder="Phone"
+  className="border p-2 rounded focus:ring focus:ring-indigo-300"
+  required
+  pattern="\d{10}"      
+  maxLength={10}        
+  inputMode="numeric"   
+  title="Phone number must be exactly 10 digits"
+/>
           <input
             name="password"
             type="password"
@@ -146,12 +151,16 @@ export default function AdminWorkers() {
             className="border p-2 rounded focus:ring focus:ring-indigo-300"
           />
           <input
-            name="pincode"
-            value={form.pincode}
-            onChange={handleChange}
-            placeholder="Pincode"
-            className="border p-2 rounded focus:ring focus:ring-indigo-300"
-          />
+  name="pincode"
+  value={form.pincode}
+  onChange={handleChange}
+  placeholder="Pincode"
+  className="border p-2 rounded focus:ring focus:ring-indigo-300"
+  required
+  pattern="\d+"         
+  inputMode="numeric"
+  title="Pincode must contain only numbers"
+/>
           <select
             name="gender"
             value={form.gender}
@@ -202,7 +211,7 @@ export default function AdminWorkers() {
           <thead className="bg-gray-800 text-white">
             <tr>
               <th className="p-3 text-left">Name</th>
-              <th className="p-3 text-left">Status</th>
+              {/* <th className="p-3 text-left">Status</th> */}
               <th className="p-3 text-left">Image</th>
               <th className="p-3 text-left">Email</th>
               <th className="p-3 text-left">Phone</th>
@@ -218,7 +227,7 @@ export default function AdminWorkers() {
             {workers.map((w) => (
               <tr key={w._id} className="border-b hover:bg-gray-50 transition">
                 <td className="p-3 font-medium">{w.name}</td>
-                <td className="p-3">
+                {/* <td className="p-3">
                   <span
                     className={`px-2 py-1 rounded-full text-xs font-semibold ${
                       w.status === "approved"
@@ -230,7 +239,7 @@ export default function AdminWorkers() {
                   >
                     {w.status || "pending"}
                   </span>
-                </td>
+                </td> */}
                 <td className="p-3 font-medium">
                   <img
                     src={w.image}

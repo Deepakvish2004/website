@@ -41,14 +41,14 @@ function App() {
 
   return (
     <div>
-      {/* Navbar with user info */}
+      
       <Navbar user={user} logout={logout} />
 
       <main className="container mx-auto p-6">
         <Routes>
-          {/* Public Routes */}
+          
           <Route path="/" element={<Home />} />
-          {/* ✅ Pass user to Services so it can redirect correctly */}
+          
           <Route path="/services" element={<Services user={user} />} />
           
           {/* Booking route protected - cannot access if not logged in */}
@@ -109,7 +109,15 @@ function App() {
           />
 
           
-            <Route path="/admin/contacts" element={<AdminContacts />} />
+           <Route 
+            path="/admin/contacts" 
+            element={
+              <ProtectedRoute adminOnly>
+                <AdminContacts />
+              </ProtectedRoute>
+            } 
+          />
+
           {/* Worker routes (optional protection if needed later) */}
           <Route path="/worker/login" element={<WorkerLogin />} />
           <Route path="/worker/dashboard" element={<WorkerDashboard />} />

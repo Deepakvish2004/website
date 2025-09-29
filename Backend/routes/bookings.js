@@ -17,7 +17,7 @@ const {
 
 const router = express.Router();
 
-// ✅ All routes below require authentication
+// All routes below are protected
 router.use(protect);
 
 router.patch("/:id/success", protect, markSuccessful);

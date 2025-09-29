@@ -8,15 +8,15 @@ const workerSchema = new mongoose.Schema(
     email: { type: String, required: true, unique: true },
     phone: { type: String },
     password: { type: String, required: true, minlength: 6 },
-    services: [{ type: String, required: true }], // e.g. ["cleaner","plumber"]
-    address: [{ type: String, required: true }], // e.g. ["123 Main St", "City", "Country"]
-    age: [{ type: Number, min: 18 }], // optional min age validation
-    pincode: { type: String },
+    services: [{ type: String, required: true }], 
+    address: [{ type: String, required: true }], 
+    age: [{ type: Number, min: 18 }], 
+    pincode: { type: Number, required: true },
     gender: { type: String, enum: ["male", "female", "other"] },
     image: { type: String },
-    active: { type: Boolean, default: true }, // ✅ worker is active by default
+    active: { type: Boolean, default: true }, 
   availability: {
-    days: [{ type: String }], // e.g. ["Monday", "Wednesday", "Friday"]
+    days: [{ type: String }], 
   },
 
   status: {

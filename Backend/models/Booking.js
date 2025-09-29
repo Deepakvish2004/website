@@ -8,18 +8,7 @@ const bookingSchema = new mongoose.Schema({
   bookingDate: { type: Date, required: true },
   status: {
     type: String,
-    enum: [
-      'pending',      // booking created
-      'accepted',     // worker accepted
-      'in_progress',
-      'confirmed',  // work started
-               // worker marked as done
-      'completed',    // user approved
-      'cancelled',    // cancelled by user/admin
-      'rejected' ,
-      "assigned" ,
-      "done",    // worker marked as done
-    ],
+    enum: ['pending', 'accepted', 'in_progress', 'confirmed', 'completed', 'cancelled', 'rejected', 'assigned', 'done'],
     default: 'pending'
   },
 
@@ -45,7 +34,7 @@ const bookingSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
-// ✅ Prevent saving bookings with past dates
+// Prevent saving bookings with past dates
 bookingSchema.pre('save', function(next) {
   if (this.bookingDate.getTime() < Date.now()) {
     return next(new Error('Booking date cannot be in the past'));
